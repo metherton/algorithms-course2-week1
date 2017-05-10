@@ -12,9 +12,9 @@ object App {
   case class LeftSquareBracket(position: Int) extends Bracket
   case class LeftRoundBracket(position: Int) extends Bracket
   case class LeftCurlyBracket(position: Int) extends Bracket
-  case class RightSquareBracket(position: Int) extends Bracket
-  case class RightRoundBracket(position: Int) extends Bracket
-  case class RightCurlyBracket(position: Int) extends Bracket
+//  case class RightSquareBracket(position: Int) extends Bracket
+//  case class RightRoundBracket(position: Int) extends Bracket
+//  case class RightCurlyBracket(position: Int) extends Bracket
 
   def main(args: Array[String]): Unit = {
     val input = (for {n <- 1 to 1; line = Console.readLine()} yield line)
@@ -67,22 +67,6 @@ object App {
     val success = isBalanced(input(0))
 
     if (success == true) println("Success") else println(badPosition)
-
-//    var balancedStack: mutable.Stack[Bracket] = mutable.Stack()
-//    var i: Int = 0
-//    input(0).foreach(c => { c match {
-//      case '[' => {i = i + 1; balancedStack.push(LeftSquareBracket(i))}
-//      case ']' => {i = i + 1; balancedStack.push(RightSquareBracket(i))}
-//      case '(' => {i = i + 1; balancedStack.push(LeftRoundBracket(i))}
-//      case ')' => {i = i + 1; balancedStack.push(RightRoundBracket(i))}
-//      case '{' => {i = i + 1; balancedStack.push(LeftCurlyBracket(i))}
-//      case '}' => {i = i + 1; balancedStack.push(RightCurlyBracket(i))}
-//      case _ => {
-//        i = i + 1
-//      }
-//    }})
-//
-//    println(balancedStack)
 
   }
 
