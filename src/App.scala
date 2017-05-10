@@ -1,34 +1,88 @@
+import scala.annotation.tailrec
+import scala.collection.mutable.Stack
+
 /**
   * Created by martin on 08/05/17.
   */
 object App {
 
+  sealed abstract class Bracket {
+    val position: Int
+  }
+  case class LeftSquareBracket(position: Int) extends Bracket
+  case class LeftRoundBracket(position: Int) extends Bracket
+  case class LeftCurlyBracket(position: Int) extends Bracket
+  case class RightSquareBracket(position: Int) extends Bracket
+  case class RightRoundBracket(position: Int) extends Bracket
+  case class RightCurlyBracket(position: Int) extends Bracket
+
   def main(args: Array[String]): Unit = {
-    val input = (for {n <- 1 to 2; line = Console.readLine()} yield line)
-    val capacity = (input.head.split(" "))(0).toInt
-    val numberOfBars = (input.head.split(" "))(1).toInt
-    val weights = input.last.split(" ").toVector.map(a => a.toInt)
+    val input = (for {n <- 1 to 1; line = Console.readLine()} yield line)
 
+    var badPosition = 0
 
-    def optimalWeight(maxWeight: Int, bars: Vector[Int]): Int = {
-      var knapsackMatrix = Array.fill(maxWeight + 1, bars.length + 1)(0)
-      (1 to bars.length).foreach(n => (1 to maxWeight).foreach(w => {
-        knapsackMatrix(w)(n) = knapsackMatrix(w)(n - 1)
-        if (bars(n - 1) <= maxWeight ) {
-          if (w >= bars(n - 1)) {
-            val tmp = knapsackMatrix(w - bars(n - 1))(n - 1) + bars(n - 1)
-            if (knapsackMatrix(w)(n) < tmp) {
-              knapsackMatrix(w)(n) = tmp
-            }
+    def isBalanced(s: String): Boolean = {
+      @tailrec
+      def loop(s: List[Char], balancedStack: Stack[Bracket], position: Int): Boolean = s match {
+        case Nil => {
+          if (balancedStack.isEmpty) true
+          else {
+            val p = balancedStack.pop
+            badPosition = p.position
+            false
           }
         }
-      }))
-      return knapsackMatrix(maxWeight)(bars.length)
+        case '[' :: (tl @ tail) => loop(tl, balancedStack.push(LeftSquareBracket(position)), position + 1)
+        case '{' :: (tl @ tail) => loop(tl, balancedStack.push(LeftCurlyBracket(position)), position + 1)
+        case '(' :: (tl @ tail) => loop(tl, balancedStack.push(LeftRoundBracket(position)), position + 1)
+        case (h @ head) :: (tl @ tail) =>
+          if ( h == ']' || h == ')' || h == '}') {
+            if (balancedStack.isEmpty) {
+              badPosition = position
+              false
+            }
+            else {
+              val t = balancedStack.pop
+              t match {
+                case LeftSquareBracket(_) if (h == ']') => loop(tl, balancedStack, position + 1)
+                case LeftRoundBracket(_) if (h == ')') => loop(tl, balancedStack, position + 1)
+                case LeftCurlyBracket(_) if (h == '}') => loop(tl, balancedStack, position + 1)
+                case _ => {
+                  badPosition = position
+                  false
+                }
+              }
+            }
+          } else {
+            loop(tail, balancedStack, position + 1)
+          }
+        case _ => {
+          println("true")
+          true
+        }
+      }
+      loop(s.toList, Stack(), 1)
     }
 
-    val maxWeight = optimalWeight(capacity, weights)
+    val success = isBalanced(input(0))
 
-    println(maxWeight)
+    if (success == true) println("Success") else println(badPosition)
+
+//    var balancedStack: mutable.Stack[Bracket] = mutable.Stack()
+//    var i: Int = 0
+//    input(0).foreach(c => { c match {
+//      case '[' => {i = i + 1; balancedStack.push(LeftSquareBracket(i))}
+//      case ']' => {i = i + 1; balancedStack.push(RightSquareBracket(i))}
+//      case '(' => {i = i + 1; balancedStack.push(LeftRoundBracket(i))}
+//      case ')' => {i = i + 1; balancedStack.push(RightRoundBracket(i))}
+//      case '{' => {i = i + 1; balancedStack.push(LeftCurlyBracket(i))}
+//      case '}' => {i = i + 1; balancedStack.push(RightCurlyBracket(i))}
+//      case _ => {
+//        i = i + 1
+//      }
+//    }})
+//
+//    println(balancedStack)
 
   }
 
